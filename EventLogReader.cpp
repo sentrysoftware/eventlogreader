@@ -4,7 +4,7 @@
 #include <winevt.h>
 #include <time.h>
 
-static const char version[] = "1.4.00";
+static const char version[] = "1.5.00";
 
 #define BUFFSIZE 2048
 #define MAX_NAME 256
@@ -196,6 +196,17 @@ int wmain(int argc, WCHAR *argv[])
 			goto usage;
 
 		goto invalid_arg;
+	}
+
+	// If no password provided in the command line, read from STDIN
+	if ((username != NULL) && (password == NULL))
+	{
+		wchar_t line[BUFFSIZE];
+		if (fgetws(line, BUFFSIZE, stdin) != NULL) 
+		{
+			line[wcslen(line) - 1] = '\0';
+			password = line;
+		}
 	}
 	
 	// Split the host from the log
