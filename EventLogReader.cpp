@@ -245,6 +245,9 @@ int wmain(int argc, WCHAR *argv[])
 			if(pos+2 >= argc)
 				goto invalid_arg;
 
+			// Initialize the query
+			memset(query, 0, sizeof(query));
+
 			// Determine the query start record number
 			if(!_wcsicmp(argv[pos+1], L"oldest"))
 				; // Nothing to do - from the oldest is the default
