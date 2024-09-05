@@ -6,41 +6,7 @@
 
 static const char version[] = "1.5.00";
 
-#define BUFFSIZE 2048
-#define MAX_NAME 256
-
-EVT_HANDLE ConnectToRemoteHost(LPWSTR lpwsRemote, LPWSTR lpwsUsername, LPWSTR lpwsPassword);
-DWORD ListEventChannels(EVT_HANDLE hRemote);
-DWORD ListChannelProviders(EVT_HANDLE hRemote, LPWSTR pwsChannelName);
-DWORD GetNewestEventRecordNumber(EVT_HANDLE hRemote, LPWSTR pwsPath, UINT64& dwNewest);
-DWORD GetOldestEventRecordNumber(EVT_HANDLE hRemote, LPWSTR pwsPath, UINT64& dwOldest);
-DWORD CountEvents(EVT_HANDLE hRemote, LPWSTR pwsQuery, UINT64& dwCount);
-DWORD DumpEvents(EVT_HANDLE hRemote, LPWSTR pwsQuery, const char *printMethod);
-int FindTimeDiff(const wchar_t *date, const wchar_t *time, UINT64& timediff);
-
-
-void SplitField(const wchar_t *field, const wchar_t delimiter, WCHAR *first, WCHAR *second)
-{
-	// Split the first and second from field
-	if(wcschr(field, delimiter))
-	{
-		int j = 0;
-		while(field[j] != delimiter)
-		{
-			first[j] = field[j];
-			j++;
-		}
-		first[j] = 0;
-		j++;
-
-		wcscpy(second, field+j);
-	}
-	else
-	{
-		first[0] = 0;
-		wcscpy(second, field);
-	}
-}
+#include "EventLogReader.h"
 
 
 ///////////////////////////////////////////////////////////////////
@@ -96,11 +62,8 @@ int wmain(int argc, WCHAR *argv[])
 			printf("%ws Version: %s\n", argv[0], version);
 
 			// Find the OS version
-			DWORD osv = GetVersion();
-			DWORD major = (DWORD) (LOBYTE(LOWORD(osv)));
-			DWORD minor = (DWORD) (HIBYTE(LOWORD(osv)));
+			PrintOSVersion();
 
-			printf("Microsoft Windows Version: %d.%d\n", major, minor);
 			return 0;
 		}
 
@@ -228,12 +191,12 @@ int wmain(int argc, WCHAR *argv[])
 
 		case 2: // GetNewestEventRecordNumber
 			if(ERROR_SUCCESS == (status = GetNewestEventRecordNumber(host, logpath, newestRecord)))
-				wprintf(L"NewestEventRecordNumber=%u\n", newestRecord);
+				wprintf(L"NewestEventRecordNumber=%llu\n", newestRecord);
 			break;
 
 		case 3: // GetOldestEventRecordNumber
 			if(ERROR_SUCCESS == (status = GetOldestEventRecordNumber(host, logpath, oldestRecord)))
-				wprintf(L"OldestEventRecordNumber=%u\n", oldestRecord);
+				wprintf(L"OldestEventRecordNumber=%llu\n", oldestRecord);
 			break;
 
 		case 4: // HowMany
@@ -404,7 +367,7 @@ int wmain(int argc, WCHAR *argv[])
 			if(whattodo == 4)
 			{
 				if(ERROR_SUCCESS == (status = CountEvents(host, xmlQuery, count)))
-					wprintf(L"MatchingEventsNumber=%u\n", count);
+					wprintf(L"MatchingEventsNumber=%llu\n", count);
 			}
 
 			else if(whattodo == 5)
@@ -424,7 +387,7 @@ int wmain(int argc, WCHAR *argv[])
 			if(pos+2 >= argc)
 				goto invalid_arg;
 
-			if (FindTimeDiff(argv[pos+1], argv[pos+2], timediff) == 1)
+			if (FindTimeDiff(std::wstring(argv[pos + 1]), std::wstring(argv[pos + 2]), timediff) == 1)
 			{
 				error = L"Invalid date/time format";
 				goto invalid_arg;
@@ -451,8 +414,8 @@ invalid_arg:
 	wprintf(L"SW_ERROR: %ws\n", error);
 
 usage:
-	printf("\n%ws,  Version %s,  Displays Windows event log contents\n", argv[0], version);
-	printf("\t\t\t\t\t on Microsoft Windows 2008 and above\n", argv[0], version);
+	printf("\n%ws,  Version %s,  Displays Windows event log content\n", argv[0], version);
+	printf("\t\t\t\t\t on Microsoft Windows 2008 and above\n");
 	printf("Usage:\n");
 	printf("  %ws -help\n", argv[0]);
 	printf("  %ws -version\n", argv[0]);
@@ -507,3 +470,54 @@ cleanup:
     return status;
 }
 
+void SplitField(const wchar_t *field, const wchar_t delimiter, WCHAR *first, WCHAR *second)
+{
+	// Split the first and second from field
+	if (wcschr(field, delimiter))
+	{
+		int j = 0;
+		while (field[j] != delimiter)
+		{
+			first[j] = field[j];
+			j++;
+		}
+		first[j] = 0;
+		j++;
+
+		wcscpy(second, field + j);
+	}
+	else
+	{
+		first[0] = 0;
+		wcscpy(second, field);
+	}
+}
+
+/**
+ * Prints the version of Windows
+ */
+void PrintOSVersion()
+{
+	RTL_OSVERSIONINFOW rovi = {0};
+	rovi.dwOSVersionInfoSize = sizeof(rovi);
+
+	// Dynamically load RtlGetVersion function from ntdll.dll
+	RtlGetVersionPtr RtlGetVersion = (RtlGetVersionPtr)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "RtlGetVersion");
+
+	if (RtlGetVersion != NULL)
+	{
+		RtlGetVersion(&rovi);
+
+		// Extract major and minor version
+		DWORD major = rovi.dwMajorVersion;
+		DWORD minor = rovi.dwMinorVersion;
+
+		// Print the OS version
+		wprintf(L"Operating System Version: %d.%d\n", major, minor);
+	}
+	else
+	{
+		// Handle error
+		wprintf(L"Failed to retrieve OS version using RtlGetVersion.\n");
+	}
+}

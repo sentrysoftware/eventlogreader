@@ -7,17 +7,7 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "ole32.lib")
 
-#define ARRAY_SIZE 10
-#define MAX_NAME 256
-
-DWORD GetEventRecordNumber(EVT_HANDLE hRemote, LPWSTR pwsPath, EVT_QUERY_FLAGS flDirection, UINT64& dwRecordNumber);
-DWORD PrintEventDetails(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventXML(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventList(EVT_HANDLE hEvent);
-DWORD PrintError(LPWSTR lpszFunction);
-LPWSTR GetMessageString(EVT_HANDLE hMetadata, EVT_HANDLE hEvent, EVT_FORMAT_MESSAGE_FLAGS FormatId);
-LPWSTR ReplaceCarriageReturn(LPWSTR lpText);
+#include "EventLogReader.h"
 
 // Create a session connect for the remote computer. Set the
 // Domain, User, and Password member to NULL to specify
@@ -981,7 +971,7 @@ LPWSTR GetMessageString(EVT_HANDLE hMetadata, EVT_HANDLE hEvent, EVT_FORMAT_MESS
 DWORD PrintError(LPWSTR lpszFunction)
 {
     // Retrieve the system error message for the last-error code
-    LPVOID lpMsgBuf;
+    LPWSTR lpMsgBuf;
     DWORD dw = GetLastError();
 
     FormatMessageW(
@@ -1040,21 +1030,6 @@ LPWSTR ReplaceCarriageReturn(LPWSTR lpText)
 	else
 		return lpText;
 }
-
-
-
-
-
-
-
-
-EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote);
-DWORD PrintResults(EVT_HANDLE hResults);
-DWORD PrintEventData(EVT_HANDLE hEvent);
-DWORD PrintEventSystemData(EVT_HANDLE hEvent);
-DWORD PrintEventValues(EVT_HANDLE hEvent);
-DWORD GetEventRecordID(EVT_HANDLE hEvent);
-
 
 EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote)
 {
