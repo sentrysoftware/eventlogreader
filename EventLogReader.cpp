@@ -80,7 +80,7 @@ int wmain(int argc, WCHAR *argv[])
 	LPWSTR username = NULL;
 	LPWSTR password = NULL;
 	LPWSTR error = L"Invalid argument";
-	
+
 	int level;
 	int whattodo;
 	int pos = 0, upos = 0, ppos = 0;
@@ -202,13 +202,13 @@ int wmain(int argc, WCHAR *argv[])
 	if ((username != NULL) && (password == NULL))
 	{
 		wchar_t line[BUFFSIZE];
-		if (fgetws(line, BUFFSIZE, stdin) != NULL) 
+		if (fgetws(line, BUFFSIZE, stdin) != NULL)
 		{
 			line[wcslen(line) - 1] = '\0';
 			password = line;
 		}
 	}
-	
+
 	// Split the host from the log
 	if((pos > 1) && (whattodo > 0))
 		SplitField(argv[1], L':', hostname, logpath);
@@ -376,8 +376,8 @@ int wmain(int argc, WCHAR *argv[])
 				}
 			}
 
-			if ((*user != '\0') && 
-				LookupAccountNameW(domain, user, &sid, &dwSize, domain, &dwSize, &sidType) && 
+			if ((*user != '\0') &&
+				LookupAccountNameW(domain, user, &sid, &dwSize, domain, &dwSize, &sidType) &&
 				ConvertSidToStringSidW(&sid, &lpSid))
 			{
 				// Add UserID criteria
@@ -444,7 +444,7 @@ int wmain(int argc, WCHAR *argv[])
 		default:
 			goto usage;
 	}
-	
+
 	goto cleanup;
 
 invalid_arg:
@@ -494,7 +494,7 @@ usage:
 	printf("  -CompleteDump  produces a semicolon delimited report containing:\n");
 	printf("                 RecordNumber, TimeGenerated, EventID, EventLevel,\n");
 	printf("                 Provider, ComputerName, User, Domain & Message\n\n");
-	
+
 	status = 1;
 
 cleanup:
