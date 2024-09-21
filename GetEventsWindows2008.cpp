@@ -7,19 +7,9 @@
 #pragma comment(lib, "advapi32.lib")
 #pragma comment(lib, "ole32.lib")
 
-#define ARRAY_SIZE 10
-#define MAX_NAME 256
+#include "EventLogReader.h"
 
-DWORD GetEventRecordNumber(EVT_HANDLE hRemote, LPWSTR pwsPath, EVT_QUERY_FLAGS flDirection, UINT64& dwRecordNumber);
-DWORD PrintEventDetails(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventXML(EVT_HANDLE hRemote, EVT_HANDLE hEvent);
-DWORD PrintEventList(EVT_HANDLE hEvent);
-DWORD PrintError(LPWSTR lpszFunction);
-LPWSTR GetMessageString(EVT_HANDLE hMetadata, EVT_HANDLE hEvent, EVT_FORMAT_MESSAGE_FLAGS FormatId);
-LPWSTR ReplaceCarriageReturn(LPWSTR lpText);
-
-// Create a session connect for the remote computer. Set the 
+// Create a session connect for the remote computer. Set the
 // Domain, User, and Password member to NULL to specify
 // the current user.
 EVT_HANDLE ConnectToRemoteHost(LPWSTR lpwsRemote, LPWSTR lpwsUsername, LPWSTR lpwsPassword)
@@ -60,7 +50,7 @@ EVT_HANDLE ConnectToRemoteHost(LPWSTR lpwsRemote, LPWSTR lpwsUsername, LPWSTR lp
 		Credentials.User = username;
 		Credentials.Password = lpwsPassword;
 	}
-	Credentials.Flags = EvtRpcLoginAuthNegotiate; 
+	Credentials.Flags = EvtRpcLoginAuthNegotiate;
 
 	// This call creates a remote seesion context; it does not actually
 	// create a connection to the remote computer. The connection to
@@ -83,7 +73,7 @@ DWORD ListEventChannels(EVT_HANDLE hRemote)
     DWORD dwBufferUsed = 0;
     DWORD status = ERROR_SUCCESS;
 
-	// Get a handle to an enumerator that contains all the names of the 
+	// Get a handle to an enumerator that contains all the names of the
     // channels registered on the computer.
     hChannels = EvtOpenChannelEnum(hRemote, 0);
 
@@ -253,9 +243,9 @@ DWORD GetEventRecordNumber(EVT_HANDLE hRemote, LPWSTR pwsPath, EVT_QUERY_FLAGS f
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvents[0], EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -319,7 +309,7 @@ DWORD CountEvents(EVT_HANDLE hRemote, LPWSTR pwsQuery, UINT64& dwCount)
         status = PrintError(L"EvtQuery");
 		goto cleanup;
     }
-	
+
     dwCount = 0;
 	while(true)
     {
@@ -364,7 +354,7 @@ DWORD DumpEvents(EVT_HANDLE hRemote, LPWSTR pwsQuery, const char *printMethod)
         status = PrintError(L"EvtQuery");
 		goto cleanup;
     }
-	
+
     while(true)
     {
         // Get a block of events from the result set
@@ -475,9 +465,9 @@ DWORD PrintEventDetails(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -512,7 +502,7 @@ DWORD PrintEventDetails(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     ft.dwLowDateTime = (DWORD)(ullTimeStamp & 0xFFFFFFFF);
     FileTimeToSystemTime(&ft, &stUTC);
     SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d;", 
+    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d;",
         stLocal.wYear, stLocal.wMonth, stLocal.wDay, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
 
     // Event ID
@@ -533,8 +523,8 @@ DWORD PrintEventDetails(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
 	if(EvtVarTypeNull != pRenderedValues[EvtSystemUserID].Type)
     {
 		if( !LookupAccountSidW(NULL, pRenderedValues[EvtSystemUserID].SidVal,
-                              lpName, &dwSize, lpDomain, 
-                              &dwSize, &SidType)) 
+                              lpName, &dwSize, lpDomain,
+                              &dwSize, &SidType))
 		{
 			wcscpy(lpName, L"N/A");
 			wcscpy(lpDomain, L"N/A");
@@ -615,9 +605,9 @@ DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -652,26 +642,26 @@ DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     ft.dwLowDateTime = (DWORD)(ullTimeStamp & 0xFFFFFFFF);
     FileTimeToSystemTime(&ft, &stUTC);
     SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d | ", 
+    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d | ",
         stLocal.wYear, stLocal.wMonth, stLocal.wDay, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
-	
+
     // Computer
 	if(wcslen(pRenderedValues[EvtSystemComputer].StringVal) > 20)
 		wprintf(L"%.18s.. | ", pRenderedValues[EvtSystemComputer].StringVal);
 	else
 		wprintf(L"%-20s | ", pRenderedValues[EvtSystemComputer].StringVal);
-	
+
     // Provider Name
 	LPCWSTR pwsProviderName =pRenderedValues[EvtSystemProviderName].StringVal;
 	if(wcslen(pwsProviderName) > 40)
 		wprintf(L"%.38s.. | ", pwsProviderName);
 	else
 		wprintf(L"%-40s | ", pwsProviderName);
-	
+
 	// Event ID
 	DWORD EventID = pRenderedValues[EvtSystemEventID].UInt16Val;
     wprintf(L"%4lu | ", EventID);
-	
+
     // Get the handle to the provider's metadata that contains the message strings.
     hProviderMetadata = EvtOpenPublisherMetadata(hRemote, pwsProviderName, NULL, 0, 0);
     if(NULL == hProviderMetadata)
@@ -679,7 +669,7 @@ DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
         status = PrintError(L"EvtOpenPublisherMetadata");
         goto cleanup;
     }
-	
+
 	// Level
 	pwsMessage = GetMessageString(hProviderMetadata, hEvent, EvtFormatMessageLevel);
     if(pwsMessage)
@@ -688,7 +678,7 @@ DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     	free(pwsMessage);
 		pwsMessage = NULL;
     }
-	
+
     // Message
     pwsMessage = GetMessageString(hProviderMetadata, hEvent, EvtFormatMessageEvent);
     if(pwsMessage)
@@ -697,7 +687,7 @@ DWORD PrintEventReport(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
 		free(pwsMessage);
         pwsMessage = NULL;
     }
-	
+
 cleanup:
 
 	if(hContext)
@@ -745,9 +735,9 @@ DWORD PrintEventXML(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -842,9 +832,9 @@ DWORD PrintEventList(EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -879,7 +869,7 @@ DWORD PrintEventList(EVT_HANDLE hEvent)
     ft.dwLowDateTime = (DWORD)(ullTimeStamp & 0xFFFFFFFF);
     FileTimeToSystemTime(&ft, &stUTC);
     SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d;", 
+    wprintf(L"%02d-%02d-%02d %02d:%02d:%02d;",
         stLocal.wYear, stLocal.wMonth, stLocal.wDay, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
 
     // Event ID
@@ -900,8 +890,8 @@ DWORD PrintEventList(EVT_HANDLE hEvent)
 	if(EvtVarTypeNull != pRenderedValues[EvtSystemUserID].Type)
     {
 		if( !LookupAccountSidW(NULL, pRenderedValues[EvtSystemUserID].SidVal,
-                              lpName, &dwSize, lpDomain, 
-                              &dwSize, &SidType)) 
+                              lpName, &dwSize, lpDomain,
+                              &dwSize, &SidType))
 		{
 			wcscpy(lpName, L"N/A");
 			wcscpy(lpDomain, L"N/A");
@@ -948,7 +938,7 @@ LPWSTR GetMessageString(EVT_HANDLE hMetadata, EVT_HANDLE hEvent, EVT_FORMAT_MESS
             // An event can contain one or more keywords. The function returns keywords
             // as a list of keyword strings. To process the list, you need to know the
             // size of the buffer, so you know when you have read the last string, or you
-            // can terminate the list of strings with a second null terminator character 
+            // can terminate the list of strings with a second null terminator character
             // as this example does.
             if((EvtFormatMessageKeyword == FormatId))
                 pBuffer[dwBufferSize-1] = L'\0';
@@ -978,14 +968,14 @@ LPWSTR GetMessageString(EVT_HANDLE hMetadata, EVT_HANDLE hEvent, EVT_FORMAT_MESS
 }
 
 
-DWORD PrintError(LPWSTR lpszFunction) 
-{ 
+DWORD PrintError(LPWSTR lpszFunction)
+{
     // Retrieve the system error message for the last-error code
-    LPVOID lpMsgBuf;
-    DWORD dw = GetLastError(); 
+    LPWSTR lpMsgBuf;
+    DWORD dw = GetLastError();
 
     FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_ALLOCATE_BUFFER |
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
@@ -1041,21 +1031,6 @@ LPWSTR ReplaceCarriageReturn(LPWSTR lpText)
 		return lpText;
 }
 
-
-
-
-
-
-
-
-EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote);
-DWORD PrintResults(EVT_HANDLE hResults);
-DWORD PrintEventData(EVT_HANDLE hEvent);
-DWORD PrintEventSystemData(EVT_HANDLE hEvent);
-DWORD PrintEventValues(EVT_HANDLE hEvent);
-DWORD GetEventRecordID(EVT_HANDLE hEvent);
-
-
 EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote)
 {
     DWORD status = ERROR_SUCCESS;
@@ -1067,7 +1042,7 @@ EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote)
 	Credentials.Domain = NULL;
 	Credentials.User = NULL;
 	Credentials.Password = NULL;
-	Credentials.Flags = EvtRpcLoginAuthNegotiate; 
+	Credentials.Flags = EvtRpcLoginAuthNegotiate;
 
 	// This call creates a remote seesion context; it does not actually
 	// create a connection to the remote computer. The connection to
@@ -1081,7 +1056,7 @@ EVT_HANDLE ConnectToRemote(LPWSTR lpwsRemote)
     return hRemote;
 }
 
-// Enumerate all the events in the result set. 
+// Enumerate all the events in the result set.
 DWORD PrintResults(EVT_HANDLE hResults)
 {
     DWORD status = ERROR_SUCCESS;
@@ -1159,9 +1134,9 @@ DWORD SummarizeEvent(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -1198,7 +1173,7 @@ DWORD SummarizeEvent(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
     ft.dwLowDateTime = (DWORD)(ullTimeStamp & 0xFFFFFFFF);
     FileTimeToSystemTime(&ft, &stUTC);
     SystemTimeToTzSpecificLocalTime(NULL, &stUTC, &stLocal);
-    wprintf(L"TimeCreated SystemTime: %02d-%02d-%02d %02d:%02d:%02d\n", 
+    wprintf(L"TimeCreated SystemTime: %02d-%02d-%02d %02d:%02d:%02d\n",
         stLocal.wYear, stLocal.wMonth, stLocal.wDay, stLocal.wHour, stLocal.wMinute, stLocal.wSecond);
 
     // Event ID
@@ -1219,8 +1194,8 @@ DWORD SummarizeEvent(EVT_HANDLE hRemote, EVT_HANDLE hEvent)
 	if(EvtVarTypeNull != pRenderedValues[EvtSystemUserID].Type)
     {
 		if( !LookupAccountSidW(NULL, pRenderedValues[EvtSystemUserID].SidVal,
-                              lpName, &dwSize, lpDomain, 
-                              &dwSize, &SidType)) 
+                              lpName, &dwSize, lpDomain,
+                              &dwSize, &SidType))
 		{
 			wcscpy(lpName, L"N/A");
 			wcscpy(lpDomain, L"N/A");
@@ -1392,9 +1367,9 @@ DWORD PrintEventSystemData(EVT_HANDLE hEvent)
     }
 
     // When you render the user data or system section of the event, you must specify
-    // the EvtRenderEventValues flag. The function returns an array of variant values 
+    // the EvtRenderEventValues flag. The function returns an array of variant values
     // for each element in the user data or system section of the event. For user data
-    // or event data, the values are returned in the same order as the elements are 
+    // or event data, the values are returned in the same order as the elements are
     // defined in the event. For system data, the values are returned in the order defined
     // in the EVT_SYSTEM_PROPERTY_ID enumeration.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
@@ -1429,7 +1404,7 @@ DWORD PrintEventSystemData(EVT_HANDLE hEvent)
         StringFromGUID2(*(pRenderedValues[EvtSystemProviderGuid].GuidVal), wsGuid, sizeof(wsGuid)/sizeof(WCHAR));
         wprintf(L"Provider Guid: %s\n", wsGuid);
     }
-    else 
+    else
     {
         wprintf(L"Provider Guid: NULL");
     }
@@ -1451,10 +1426,10 @@ DWORD PrintEventSystemData(EVT_HANDLE hEvent)
     ullTimeStamp = pRenderedValues[EvtSystemTimeCreated].FileTimeVal;
     ft.dwHighDateTime = (DWORD)((ullTimeStamp >> 32) & 0xFFFFFFFF);
     ft.dwLowDateTime = (DWORD)(ullTimeStamp & 0xFFFFFFFF);
-    
+
     FileTimeToSystemTime(&ft, &st);
     ullNanoseconds = (ullTimeStamp % 10000000) * 100; // Display nanoseconds instead of milliseconds for higher resolution
-    wprintf(L"TimeCreated SystemTime: %02d/%02d/%02d %02d:%02d:%02d.%I64u)\n", 
+    wprintf(L"TimeCreated SystemTime: %02d/%02d/%02d %02d:%02d:%02d.%I64u)\n",
         st.wMonth, st.wDay, st.wYear, st.wHour, st.wMinute, st.wSecond, ullNanoseconds);
 
 	wprintf(L"EventRecordID: %I64u\n", pRenderedValues[EvtSystemEventRecordId].UInt64Val);
@@ -1519,7 +1494,7 @@ DWORD PrintEventValues(EVT_HANDLE hEvent)
     }
 
     // The function returns an array of variant values for each element or attribute that
-    // you want to retrieve from the event. The values are returned in the same order as 
+    // you want to retrieve from the event. The values are returned in the same order as
     // you requested them.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
     {
@@ -1586,7 +1561,7 @@ DWORD GetEventRecordID(EVT_HANDLE hEvent)
     }
 
     // The function returns an array of variant values for each element or attribute that
-    // you want to retrieve from the event. The values are returned in the same order as 
+    // you want to retrieve from the event. The values are returned in the same order as
     // you requested them.
     if(!EvtRender(hContext, hEvent, EvtRenderEventValues, dwBufferSize, pRenderedValues, &dwBufferUsed, &dwPropertyCount))
     {
