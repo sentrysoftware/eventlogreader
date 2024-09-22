@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include "version.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -27,18 +28,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
     "\r\n"
     "\0"
@@ -65,9 +66,9 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,2,0,0
- PRODUCTVERSION 1,2,0,0
- FILEFLAGSMASK 0x17L
+ FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,VERSION_BUILD
+ PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH,VERSION_BUILD
+ FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
 #else
@@ -81,15 +82,14 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Efficient tool to dump the Windows EventLog"
             VALUE "CompanyName", "Sentry Software"
-            VALUE "FileDescription", "Efficient tool to dump the Windows EventLog"
-            VALUE "FileVersion", "1, 2, 0, 0"
-            VALUE "InternalName", "SW_EventLogReader.Exe"
-            VALUE "LegalCopyright", "Copyright (C) 2005 Sentry Software"
-            VALUE "OriginalFilename", "SW_EventLogReader.Exe"
-            VALUE "ProductName", "SW_EventLogReader.Exe"
-            VALUE "ProductVersion", "1, 2, 0, 0"
+            VALUE "FileDescription", "High-performance command-line utility to query the Windows event logs"
+            VALUE "FileVersion", VERSION_STR
+            VALUE "ProductVersion", VERSION_STR
+            VALUE "InternalName", EXECUTABLE_NAME
+            VALUE "OriginalFilename", EXECUTABLE_NAME
+            VALUE "ProductName", EXECUTABLE_NAME
+            VALUE "LegalCopyright", COPYRIGHT
         END
     END
     BLOCK "VarFileInfo"
