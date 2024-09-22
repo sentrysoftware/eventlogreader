@@ -4,8 +4,7 @@
 #include <winevt.h>
 #include <time.h>
 
-static const char version[] = "1.5.00";
-
+#include "version.h"
 #include "EventLogReader.h"
 
 
@@ -59,10 +58,13 @@ int wmain(int argc, WCHAR *argv[])
 
 		if(!_wcsicmp(argv[i], L"-version"))
 		{
-			printf("%ws Version: %s\n", argv[0], version);
+			printf("%s Version: %s\n", EXECUTABLE_NAME, VERSION_STR);
 
 			// Find the OS version
 			PrintOSVersion();
+
+			// Print copyright
+			printf("%s\n", COPYRIGHT);
 
 			return 0;
 		}
@@ -414,13 +416,13 @@ invalid_arg:
 	wprintf(L"SW_ERROR: %ws\n", error);
 
 usage:
-	printf("\n%ws,  Version %s,  Displays Windows event log content\n", argv[0], version);
+	printf("\n%s,  Version %s,  Displays Windows event log content\n", EXECUTABLE_NAME, VERSION_STR);
 	printf("\t\t\t\t\t on Microsoft Windows 2008 and above\n");
 	printf("Usage:\n");
-	printf("  %ws -help\n", argv[0]);
-	printf("  %ws -version\n", argv[0]);
-	printf("  %ws [<host>] [-u <username> -p <password>] -ListEventLogs\n", argv[0]);
-	printf("  %ws [<host>:]<log> [-u <username> -p <password>]\n", argv[0]);
+	printf("  %s -help\n", EXECUTABLE_NAME);
+	printf("  %s -version\n", EXECUTABLE_NAME);
+	printf("  %s [<host>] [-u <username> -p <password>] -ListEventLogs\n", EXECUTABLE_NAME);
+	printf("  %s [<host>:]<log> [-u <username> -p <password>]\n", EXECUTABLE_NAME);
 	printf("\t\t\t -ListEventLogProviders\n");
 	printf("\t\t\t -GetNewestEventRecordNumber\n");
 	printf("\t\t\t -GetOldestEventRecordNumber\n");
