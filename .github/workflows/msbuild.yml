@@ -15,6 +15,9 @@ env:
   # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
   BUILD_CONFIGURATION: Release
 
+  # Artifact name
+  ARTIFACT_NAME: EventLogReader
+
 permissions:
   contents: read
 
@@ -30,7 +33,6 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build
-      working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /t:Rebuild /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
@@ -38,5 +40,6 @@ jobs:
     - name: Upload Executable Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: SEN_EventLogReader_exe
-        path: ./Release/SEN_EventLogReader.exe
+        name: ${{env.ARTIFACT_NAME}}
+        path: ./Release/*.exe
+        if-no-files-found: error
