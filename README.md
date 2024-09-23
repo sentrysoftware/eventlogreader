@@ -10,13 +10,13 @@ High-performance command-line utility to query the Windows event logs, locally o
 ## Usage
 
 ```
-SEN_EventLogReader.exe,  Version 1.5.00,  Displays Windows event log content
+EventLogReader,  Version 2.0.00,  Displays Windows event log content
                                          on Microsoft Windows 2008 and above
 Usage:
-  Release\SEN_EventLogReader.exe -help
-  Release\SEN_EventLogReader.exe -version
-  Release\SEN_EventLogReader.exe [<host>] [-u <username> -p <password>] -ListEventLogs
-  Release\SEN_EventLogReader.exe [<host>:]<log> [-u <username> -p <password>]
+  EventLogReader -help
+  EventLogReader -version
+  EventLogReader [<host>] [-u <username> -p <password>] -ListEventLogs
+  EventLogReader [<host>:]<log> [-u <username> -p <password>]
                          -ListEventLogProviders
                          -GetNewestEventRecordNumber
                          -GetOldestEventRecordNumber
@@ -74,7 +74,7 @@ Then, run the below command at the root of the repository to build the project:
 msbuild /t:Rebuild /p:Configuration=Release .
 ```
 
-This will produce one `SEN_EventLogReader.exe` artifact in the `./Release` folder.
+This will produce one `EventLogReader.exe` artifact in the `./Release` folder.
 
 ## Contribute
 
