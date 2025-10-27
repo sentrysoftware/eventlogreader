@@ -38,7 +38,7 @@ jobs:
       run: msbuild /t:Rebuild /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
 
     - name: Upload Executable Artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ${{env.ARTIFACT_NAME}}
         path: ./Release/*.exe
